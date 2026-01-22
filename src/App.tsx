@@ -12,6 +12,7 @@ function App() {
   const [language, setLanguage] = useState<'uz' | 'en'>('uz');
   const [hasSkipPenalty, setHasSkipPenalty] = useState(true);
   const [winningScore, setWinningScore] = useState(50);
+  const [roundDuration, setRoundDuration] = useState(60); // MOVED INSIDE
   
   // 2. Gameplay State
   const [teams, setTeams] = useState<Team[]>([
@@ -21,7 +22,7 @@ function App() {
   const [currentTeamIndex, setCurrentTeamIndex] = useState(0);
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
   const [roundScore, setRoundScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(60);
+  const [timeLeft, setTimeLeft] = useState(60); // REMOVED DUPLICATE
 
   // 3. Game Logic Functions
   const getRandomWord = useCallback(() => {
@@ -48,7 +49,7 @@ function App() {
     });
   }, [currentTeamIndex, roundScore, winningScore]);
 
-  // 4. Timer Effect
+  // 4. Timer Logic
   useEffect(() => {
     let interval: number;
     if (gameState === 'PLAYING' && timeLeft > 0) {
@@ -59,7 +60,7 @@ function App() {
     return () => clearInterval(interval);
   }, [gameState, timeLeft]);
 
-  // 4b. Handle Round End
+  // 4b. Handle Round End When Time Expires
   useEffect(() => {
     if (timeLeft === 0 && gameState === 'PLAYING') {
       const timer = setTimeout(() => {
@@ -83,7 +84,7 @@ function App() {
 
   const startRound = () => {
     setRoundScore(0);
-    setTimeLeft(60);
+    setTimeLeft(roundDuration); // Uses the custom duration set in menu
     setCurrentWord(getRandomWord());
     setGameState('PLAYING');
   };
@@ -102,11 +103,10 @@ function App() {
     setGameState('START');
   };
 
-  // 6. UI Render
+  // 6. UI Render (Same as yours, but ensured clean integration)
   return (
     <div style={styles.container}>
       
-      {/* LANGUAGE SELECTION */}
       {gameState === 'LANG_SELECT' && (
         <div style={styles.fullScreenCenter}>
           <h1 style={styles.brandTitle}>ALIAS</h1>
@@ -116,30 +116,28 @@ function App() {
         </div>
       )}
 
-      {/* SETTINGS SCREEN */}
       {gameState === 'SETTINGS' && (
         <div style={styles.fullScreenCenter}>
           <h2 style={styles.title}>{teams[0].name} vs {teams[1].name}</h2>
           
           <div style={styles.settingsBox}>
             <div style={styles.settingRow}>
+              <span>{language === 'uz' ? "Vaqt (soniya):" : "Round Time (sec):"}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <button onClick={() => setRoundDuration(prev => Math.max(30, prev - 30))} style={styles.smallCircleBtn}>-</button>
+                <span style={{ fontWeight: 'bold', fontSize: '20px' }}>{roundDuration}</span>
+                <button onClick={() => setRoundDuration(prev => Math.min(300, prev + 30))} style={styles.smallCircleBtn}>+</button>
+              </div>
+            </div>
+
+            <div style={styles.settingRow}>
               <span>{language === 'uz' ? "Jarima (-1):" : "Skip Penalty (-1):"}</span>
-              <input 
-                type="checkbox" 
-                checked={hasSkipPenalty} 
-                onChange={() => setHasSkipPenalty(!hasSkipPenalty)} 
-                style={styles.checkbox}
-              />
+              <input type="checkbox" checked={hasSkipPenalty} onChange={() => setHasSkipPenalty(!hasSkipPenalty)} style={styles.checkbox}/>
             </div>
             
             <div style={styles.settingRow}>
               <span>{language === 'uz' ? "G'alaba ochkosi:" : "Winning Score:"}</span>
-              <input 
-                type="number" 
-                value={winningScore} 
-                onChange={(e) => setWinningScore(Number(e.target.value))} 
-                style={styles.numberInput}
-              />
+              <input type="number" value={winningScore} onChange={(e) => setWinningScore(Number(e.target.value))} style={styles.numberInput}/>
             </div>
           </div>
 
@@ -147,7 +145,6 @@ function App() {
         </div>
       )}
 
-      {/* READY SCREEN */}
       {gameState === 'START' && (
         <div style={styles.gameContent}>
           <div style={styles.scoreHeader}>
@@ -165,12 +162,18 @@ function App() {
         </div>
       )}
 
-      {/* ACTIVE PLAYING SCREEN */}
       {gameState === 'PLAYING' && (
         <div style={styles.gameContent}>
           <div style={styles.playHeader}>
             <div style={styles.timerVal}>{timeLeft}s</div>
             <div style={styles.roundPoints}>Score: {roundScore}</div>
+          </div>
+
+          <div style={styles.timerContainer}>
+            <div style={{
+              ...styles.timerProgress, 
+              width: `${(timeLeft / roundDuration) * 100}%`
+            }}></div>
           </div>
           
           <div style={styles.wordArea}>
@@ -184,7 +187,6 @@ function App() {
         </div>
       )}
 
-      {/* REVIEW SCREEN */}
       {gameState === 'REVIEW' && (
         <div style={styles.fullScreenCenter}>
           <h2 style={{color: '#94a3b8'}}>{language === 'uz' ? "Raund tugadi!" : "Round Over!"}</h2>
@@ -195,7 +197,6 @@ function App() {
         </div>
       )}
 
-      {/* GAME OVER */}
       {gameState === 'GAME_OVER' && (
         <div style={styles.fullScreenCenter}>
           <h1 style={styles.brandTitle}>G'ALABA!</h1>
@@ -208,7 +209,6 @@ function App() {
   );
 }
 
-// Styling (No changes needed here)
 const styles: Record<string, React.CSSProperties> = {
   container: { backgroundColor: '#0f172a', color: '#f8fafc', minHeight: '100dvh', fontFamily: 'system-ui, sans-serif', display: 'flex', flexDirection: 'column', overflow: 'hidden' },
   fullScreenCenter: { flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '40px', textAlign: 'center' },
@@ -231,10 +231,13 @@ const styles: Record<string, React.CSSProperties> = {
   roundPoints: { fontSize: '24px', fontWeight: 'bold' },
   wordArea: { flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' },
   wordText: { fontSize: '64px', fontWeight: 'bold', textAlign: 'center', textTransform: 'uppercase', margin: '0' },
+  timerContainer: { width: '100%', height: '8px', backgroundColor: '#1e293b', borderRadius: '4px', overflow: 'hidden', margin: '0 20px' },
+  timerProgress: { height: '100%', backgroundColor: '#38bdf8', transition: 'width 1s linear' },
   actionArea: { display: 'flex', flexDirection: 'column', gap: '10px', padding: '20px' },
   correctBtn: { padding: '35px', borderRadius: '20px', border: 'none', backgroundColor: '#22c55e', color: '#fff', fontSize: '24px', fontWeight: 'bold' },
   skipBtn: { padding: '20px', borderRadius: '20px', border: 'none', backgroundColor: '#475569', color: '#fff', fontSize: '16px', fontWeight: 'bold' },
-  resultDisplay: { fontSize: '80px', fontWeight: 'bold', color: '#22c55e', marginBottom: '40px' }
+  resultDisplay: { fontSize: '80px', fontWeight: 'bold', color: '#22c55e', marginBottom: '40px' },
+  smallCircleBtn: { width: '40px', height: '40px', borderRadius: '50%', border: 'none', backgroundColor: '#38bdf8', color: '#0f172a', fontSize: '20px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' },
 };
 
 export default App;
