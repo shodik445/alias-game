@@ -133,7 +133,7 @@ function App() {
                 <button onClick={() => setRoundDuration(p => Math.min(300, p + 30))} style={styles.circleBtn}>+</button>
               </div>
             </div>
-
+          <div style={styles.settingRow}>
             <span>{language === 'uz' ? "G'alaba balli:" : "Winning Score:"}</span>
             <div style={styles.flexCenter}>
               <button 
@@ -146,7 +146,7 @@ function App() {
                 style={styles.circleBtn}
               >+</button>
             </div>
-
+          </div>
             <div style={styles.settingRow}>
               <span>{language === 'uz' ? "Jarima (-1):" : "Penalty (-1):"}</span>
               <input type="checkbox" checked={hasSkipPenalty} onChange={() => setHasSkipPenalty(!hasSkipPenalty)} style={styles.checkbox}/>
