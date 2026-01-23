@@ -8,7 +8,7 @@ interface RoundAttempt {
   isCorrect: boolean;
 }
 
-const teamNamesUz = ["Sherlar", "Burgutlar", "Lochinlar", "Alpomishlar", "Chavandozlar", "Vityazlar"];
+const teamNamesUz = ["Sherlar", "Burgutlar", "Lochinlar", "Alpomishlar", "Chavandozlar", "Do'stlar", "Yulduzlar", "Bo'riq", "Qahramonlar", "Temirchilar", "Farishtalar"];
 const teamNamesEn = ["Lions", "Eagles", "Falcons", "Warriors", "Riders", "Wolves"];
 
 function App() {
