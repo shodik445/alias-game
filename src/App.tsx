@@ -40,7 +40,7 @@ function App() {
   // OPTIMIZATION: Use a shuffled deck instead of filtering used IDs every turn
   const [wordDeck, setWordDeck] = useState<Word[]>([]);
   const [roundHistory, setRoundHistory] = useState<RoundAttempt[]>([]);
-
+  console.log(wordDeck);
   // Sound Refs
   const correctSound = useRef(new Audio('/correct.mp3'));
   const skipSound = useRef(new Audio('/skip.mp3'));
