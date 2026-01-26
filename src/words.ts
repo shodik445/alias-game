@@ -4996,6 +4996,151 @@ export const wordBank: Record<string, Word[]> = {
     "id": 999,
     "text": "Qit’a.",
     "difficulty": "medium"
+  },
+    {
+    "id": 1000,
+    "text": "Kungfu Panda",
+    "difficulty": "medium"
+  },
+    {
+    "id": 1001,
+    "text": "Mortal Kombat",
+    "difficulty": "medium"
+  },
+    {
+    "id": 1002,
+    "text": "Yazva",
+    "difficulty": "medium"
+  },
+    {
+    "id": 1003,
+    "text": "Fotiha",
+    "difficulty": "medium"
+  },
+    {
+    "id": 1004,
+    "text": "Yasin",
+    "difficulty": "medium"
+  },  
+  {
+    "id": 1005,
+    "text": "Dajjol",
+    "difficulty": "medium"
+  },
+    {
+    "id": 1006,
+    "text": "Xitoy",
+    "difficulty": "medium"
+  },
+    {
+    "id": 1007,
+    "text": "Korea",
+    "difficulty": "medium"
+  },
+    {
+    "id": 1008,
+    "text": "Hazil",
+    "difficulty": "medium"
+  },
+    {
+    "id": 1009,
+    "text": "Kanareyka",
+    "difficulty": "medium"
+  },
+    {
+    "id": 1010,
+    "text": "Meshqorin",
+    "difficulty": "medium"
+  },
+    {
+    "id": 1011,
+    "text": "Kibr",
+    "difficulty": "medium"
+  },
+    {
+    "id": 1012,
+    "text": "Balog'at",
+    "difficulty": "medium"
+  },
+    {
+    "id": 1013,
+    "text": "Manti",
+    "difficulty": "medium"
+  },
+    {
+    "id": 1014,
+    "text": "Pashsha",
+    "difficulty": "medium"
+  },
+    {
+    "id": 1015,
+    "text": "Qumursqa",
+    "difficulty": "medium"
+  },
+    {
+    "id": 1016,
+    "text": "Ko'rqingchli",
+    "difficulty": "medium"
+  },
+    {
+    "id": 1017,
+    "text": "Prezident",
+    "difficulty": "medium"
+  },
+    {
+    "id": 1018,
+    "text": "Latofat",
+    "difficulty": "medium"
+  },
+    {
+    "id": 1019,
+    "text": "Kesish",
+    "difficulty": "medium"
+  },
+    {
+    "id": 1020,
+    "text": "Masqaraboz",
+    "difficulty": "medium"
+  },
+    {
+    "id": 1021,
+    "text": "Kulcha",
+    "difficulty": "medium"
+  },
+    {
+    "id": 1022,
+    "text": "Unitaz",
+    "difficulty": "medium"
+  },
+    {
+    "id": 1023,
+    "text": "Oshqozon",
+    "difficulty": "medium"
+  },
+    {
+    "id": 1024,
+    "text": "Kislata",
+    "difficulty": "medium"
+  },
+   {
+    "id": 1025,
+    "text": "Bosh Barmoq",
+    "difficulty": "medium"
+  },
+   {
+    "id": 1026,
+    "text": "Mario",
+    "difficulty": "medium"
+  },
+   {
+    "id": 1027,
+    "text": "Somsa",
+    "difficulty": "medium"
+  },
+   {
+    "id": 1028,
+    "text": "Chivin",
+    "difficulty": "medium"
   }
 ],
   en: [
