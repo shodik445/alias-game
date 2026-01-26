@@ -8,7 +8,9 @@ interface RoundAttempt {
   isCorrect: boolean;
 }
 
-const teamNamesUz = ["Sherlar", "Burgutlar", "Lochinlar", "Alpomishlar", "Chavandozlar", "Do'stlar", "Yulduzlar", "Bo'riq", "Qahramonlar", "Temirchilar", "Farishtalar"];
+const teamNamesUz = ["Chumoli ovoz Sherlar", "Birko'zli Burgutlar", "Hasharotxo'r Lochinlar", 
+                    "Yovuz Quyonchalar", "Otqochar Chavandozlar","Ozg'in Pandalar",
+                    "Tezkor Shilliqqurtlar", "Qo'nxo'r Qo'ylar"];
 const teamNamesEn = ["Lions", "Eagles", "Falcons", "Warriors", "Riders", "Wolves"];
 
 // Helper: Fisher-Yates Shuffle for O(n) randomization

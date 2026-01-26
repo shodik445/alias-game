@@ -5141,7 +5141,72 @@ export const wordBank: Record<string, Word[]> = {
     "id": 1028,
     "text": "Chivin",
     "difficulty": "medium"
-  }
+  },
+     {
+    "id": 1029,
+    "text": "Uylanish",
+    "difficulty": "medium"
+  },
+     {
+    "id": 1030,
+    "text": "Paxta",
+    "difficulty": "medium"
+  },
+     {
+    "id": 1031,
+    "text": "Oltin Baliq",
+    "difficulty": "medium"
+  },
+     {
+    "id": 1032,
+    "text": "Olov",
+    "difficulty": "medium"
+  },
+     {
+    "id": 1033,
+    "text": "Registon",
+    "difficulty": "medium"
+  },
+     {
+    "id": 1034,
+    "text": "Pora",
+    "difficulty": "medium"
+  },
+     {
+    "id": 1035,
+    "text": "Yalmog'iz",
+    "difficulty": "medium"
+  },
+     {
+    "id": 1036,
+    "text": "Kashshey",
+    "difficulty": "medium"
+  },
+     {
+    "id": 1037,
+    "text": "Tuz",
+    "difficulty": "medium"
+  },
+     {
+    "id": 1038,
+    "text": "Panjara",
+    "difficulty": "medium"
+  },
+     {
+    "id": 1039,
+    "text": "Qazi",
+    "difficulty": "medium"
+  },
+     {
+    "id": 1040,
+    "text": "Lagman",
+    "difficulty": "medium"
+  },
+     {
+    "id": 1041,
+    "text": "Nevara",
+    "difficulty": "medium"
+  },
 ],
   en: [
     { id: 9000, text: 'Apple', difficulty: 'easy' },
