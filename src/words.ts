@@ -79,7 +79,7 @@ export const wordBank: Record<string, Word[]> = {
   },
   {
     "id": 16,
-    "text": "Bu",
+    "text": "Jumong seriali",
     "difficulty": "easy"
   },
   {
@@ -1289,7 +1289,7 @@ export const wordBank: Record<string, Word[]> = {
   },
   {
     "id": 258,
-    "text": "Boshladi",
+    "text": "Boshlash",
     "difficulty": "medium"
   },
   {
@@ -2004,7 +2004,7 @@ export const wordBank: Record<string, Word[]> = {
   },
   {
     "id": 401,
-    "text": "Birlik",
+    "text": "Beshiktebratar",
     "difficulty": "medium"
   },
   {
