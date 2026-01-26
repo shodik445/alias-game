@@ -48,7 +48,7 @@ function App() {
   const [finalChancePending, setFinalChancePending] = useState<number | null>(null);
   // null = not awarded yet, -1 = no one, 0/1 = team index awarded
   const [lastWordAwarded, setLastWordAwarded] = useState<number | null>(null);
-  console.log(wordDeck);
+  console.log(wordDeck,team1HasPlayedFinal,suddenRounds);
   // Sound Refs
   const correctSound = useRef(new Audio('/correct.mp3'));
   const skipSound = useRef(new Audio('/skip.mp3'));
