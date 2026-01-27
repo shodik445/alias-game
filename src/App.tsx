@@ -368,13 +368,13 @@ function App() {
             <div style={{display: 'flex', gap: '10px'}}>
               <button
                 onClick={() => awardPoint(0)}
-                style={{...styles.awardBtn, flex: 1, border: lastWordAwarded === 0 ? '3px solid #0369a1' : '3px solid transparent'}}
+                style={{...styles.awardBtn, flex: 1, backgroundColor: lastWordAwarded === 0 ? '#10b981' : '#38bdf8', border: lastWordAwarded === 0 ? '3px solid #059669' : '3px solid transparent'}}
               >
                 {teams[0].name}
               </button>
               <button
                 onClick={() => awardPoint(1)}
-                style={{...styles.awardBtn, flex: 1, border: lastWordAwarded === 1 ? '3px solid #0369a1' : '3px solid transparent'}}
+                style={{...styles.awardBtn, flex: 1, backgroundColor: lastWordAwarded === 1 ? '#10b981' : '#38bdf8', border: lastWordAwarded === 1 ? '3px solid #059669' : '3px solid transparent'}}
               >
                 {teams[1].name}
               </button>
