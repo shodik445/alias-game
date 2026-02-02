@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { wordBank } from './words';
 import type { GameState, Word, Team } from './types';
 import { Capacitor } from '@capacitor/core';
@@ -75,6 +75,7 @@ function App() {
   const [currentTeamIndex, setCurrentTeamIndex] = useState(0);
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
   const [timeLeft, setTimeLeft] = useState(60);
+  const timeLeftRef = useRef(timeLeft);
   
   // OPTIMIZATION: Use a shuffled deck instead of filtering used IDs every turn
   const [wordDeck, setWordDeck] = useState<Word[]>([]);
@@ -130,14 +131,11 @@ function App() {
     });
   }, [language]);
 
-  // 1. Preload the sounds when the app starts so they are "ready" in memory
 // HOOK 1: Preloading (Only runs once when the app opens)
 useEffect(() => {
   const initAudio = async () => {
-    // 1. Only run NativeAudio if we are actually on a mobile device
     if (Capacitor.isNativePlatform()) {
       try {
-        // IMPORTANT: No "/" before the filename for Native Audio on iOS
         await NativeAudio.preload({
           assetId: 'correct',
           assetPath: 'public/correct.mp3', 
@@ -148,40 +146,79 @@ useEffect(() => {
           assetPath: 'public/skip.mp3',
           audioChannelNum: 1
         });
+        // Add the tick sound here
+        await NativeAudio.preload({
+          assetId: 'tick',
+          assetPath: 'public/tick.mp3', 
+          audioChannelNum: 1
+        });
       } catch (e) {
         console.error('Native Audio Preload Failed:', e);
       }
     }
   };
-
   initAudio();
 }, []);
 
-// HOOK 2: Timer Logic (Runs whenever gameState changes)
+
+// This keeps the Ref in sync with the State
+useEffect(() => { 
+  timeLeftRef.current = timeLeft; 
+}, [timeLeft]);
+
 useEffect(() => {
-  let interval: number;
+  let interval: number | undefined;
+
   if (gameState === 'PLAYING') {
     interval = window.setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          // REMOVED: NativeAudio.play({ assetId: 'end' }); 
-          setLastWordAwarded(null);
-          setGameState('AWAIT_REVIEW');
-          return 0;
+      const currentTime = timeLeftRef.current;
+
+      if (currentTime <= 0) {
+        clearInterval(interval);
+        // Stop the sound if it's still playing when time hits 0
+        if (Capacitor.isNativePlatform()) {
+          NativeAudio.stop({ assetId: 'tick' }).catch(() => {});
         }
-        return prev - 1;
-      });
+        setGameState('AWAIT_REVIEW');
+        setLastWordAwarded(null);
+        return;
+      }
+
+      const nextTime = currentTime - 1;
+
+      // FIX: Trigger the sound ONLY ONCE at exactly 8 seconds
+      if (nextTime === 8) {
+        if (Capacitor.isNativePlatform()) {
+          NativeAudio.play({ assetId: 'tick' }).catch(() => {});
+        } else {
+          // Localhost: we store the audio in a variable to stop it later if needed
+          const audio = new Audio('/tick.mp3');
+          audio.id = 'active-tick-sound';
+          audio.play().catch(() => {});
+        }
+      }
+
+      setTimeLeft(nextTime);
     }, 1000);
   }
-  return () => clearInterval(interval);
+
+  return () => {
+    if (interval) {
+      clearInterval(interval);
+      // Safety: Stop the sound if the user exits the game or switches screens
+      if (Capacitor.isNativePlatform()) {
+        NativeAudio.stop({ assetId: 'tick' }).catch(() => {});
+      }
+    }
+  };
 }, [gameState]);
 
-  const startRound = () => {
+//Action Functions
+const startRound = () => {
     setRoundHistory([]);
     setTimeLeft(roundDuration);
     setLastWordAwarded(null);
-    getNextWord(); // Get first word
+    getNextWord(); 
     setGameState('PLAYING');
   };
 
