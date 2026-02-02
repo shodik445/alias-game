@@ -381,7 +381,9 @@ const handleAction = (isCorrect: boolean) => {
               <input type="checkbox" checked={hasSkipPenalty} onChange={() => setHasSkipPenalty(!hasSkipPenalty)} style={styles.checkbox}/>
             </div>
           </div>
-          <button style={styles.mainButton} onClick={() => setGameState('START')}>DAVOM ETISH</button>
+            <button style={styles.mainButton} onClick={() => setGameState('START')}>
+              {language === 'uz' ? "DAVOM ETISH" : "CONTINUE"}
+            </button>
         </div>
       )}
 
