@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Alias-Uzbek</string>
+    <string name="title_activity_main">Alias-Uzbek</string>
+    <string name="package_name">com.shodik24.alias</string>
+    <string name="custom_url_scheme">com.shodik24.alias</string>
+</resources>

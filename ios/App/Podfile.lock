@@ -1,0 +1,34 @@
+PODS:
+  - Capacitor (8.0.2):
+    - CapacitorCordova
+  - CapacitorCommunityNativeAudio (8.0.0):
+    - Capacitor
+  - CapacitorCordova (8.0.2)
+  - CapacitorStatusBar (8.0.0):
+    - Capacitor
+
+DEPENDENCIES:
+  - "Capacitor (from `../../node_modules/@capacitor/ios`)"
+  - "CapacitorCommunityNativeAudio (from `../../node_modules/@capacitor-community/native-audio`)"
+  - "CapacitorCordova (from `../../node_modules/@capacitor/ios`)"
+  - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
+
+EXTERNAL SOURCES:
+  Capacitor:
+    :path: "../../node_modules/@capacitor/ios"
+  CapacitorCommunityNativeAudio:
+    :path: "../../node_modules/@capacitor-community/native-audio"
+  CapacitorCordova:
+    :path: "../../node_modules/@capacitor/ios"
+  CapacitorStatusBar:
+    :path: "../../node_modules/@capacitor/status-bar"
+
+SPEC CHECKSUMS:
+  Capacitor: 2b79172ad27f3be2d103cce88b8eb9803fdcc744
+  CapacitorCommunityNativeAudio: 0d1336ea95a8f1911292e082d5436961e4447cd8
+  CapacitorCordova: 921bdb690ebe82421b24fce45552fd3dea2ae43a
+  CapacitorStatusBar: 312e2e67928dfe9514c4a8916a1fd610552f5f35
+
+PODFILE CHECKSUM: e8120a166064296aded4daff46ae2ca998c011d5
+
+COCOAPODS: 1.16.2

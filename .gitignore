@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Dependency directories
+android-keys/
+node_modules/
+dist/
