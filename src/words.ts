@@ -5209,7 +5209,60 @@ export const wordBank: Record<string, Word[]> = {
   },
 ],
   en: [
+    // --- EASY (1-20) ---
     { id: 9000, text: 'Apple', difficulty: 'easy' },
-    { id: 9001, text: 'Computer', difficulty: 'medium' }
-  ]
+    { id: 9001, text: 'Banana', difficulty: 'easy' },
+    { id: 9002, text: 'Sun', difficulty: 'easy' },
+    { id: 9003, text: 'Water', difficulty: 'easy' },
+    { id: 9004, text: 'House', difficulty: 'easy' },
+    { id: 9005, text: 'Dog', difficulty: 'easy' },
+    { id: 9006, text: 'Cat', difficulty: 'easy' },
+    { id: 9007, text: 'Tree', difficulty: 'easy' },
+    { id: 9008, text: 'Book', difficulty: 'easy' },
+    { id: 9009, text: 'Chair', difficulty: 'easy' },
+    { id: 9010, text: 'Phone', difficulty: 'easy' },
+    { id: 9011, text: 'Ball', difficulty: 'easy' },
+    { id: 9012, text: 'Fish', difficulty: 'easy' },
+    { id: 9013, text: 'Milk', difficulty: 'easy' },
+    { id: 9014, text: 'Bread', difficulty: 'easy' },
+    { id: 9015, text: 'School', difficulty: 'easy' },
+    { id: 9016, text: 'Music', difficulty: 'easy' },
+    { id: 9017, text: 'Friend', difficulty: 'easy' },
+    { id: 9018, text: 'Clock', difficulty: 'easy' },
+    { id: 9019, text: 'Green', difficulty: 'easy' },
+
+    // --- MEDIUM (21-40) ---
+    { id: 9020, text: 'Computer', difficulty: 'medium' },
+    { id: 9021, text: 'Airplane', difficulty: 'medium' },
+    { id: 9022, text: 'Mountain', difficulty: 'medium' },
+    { id: 9023, text: 'Internet', difficulty: 'medium' },
+    { id: 9024, text: 'Keyboard', difficulty: 'medium' },
+    { id: 9025, text: 'Universe', difficulty: 'medium' },
+    { id: 9026, text: 'Adventure', difficulty: 'medium' },
+    { id: 9027, text: 'Skeleton', difficulty: 'medium' },
+    { id: 9028, text: 'Hospital', difficulty: 'medium' },
+    { id: 9029, text: 'Chocolate', difficulty: 'medium' },
+    { id: 9030, text: 'Dolphin', difficulty: 'medium' },
+    { id: 9031, text: 'Bicycle', difficulty: 'medium' },
+    { id: 9032, text: 'Passport', difficulty: 'medium' },
+    { id: 9033, text: 'Painting', difficulty: 'medium' },
+    { id: 9034, text: 'Battery', difficulty: 'medium' },
+    { id: 9035, text: 'Kitchen', difficulty: 'medium' },
+    { id: 9036, text: 'Journal', difficulty: 'medium' },
+    { id: 9037, text: 'Camera', difficulty: 'medium' },
+    { id: 9038, text: 'Library', difficulty: 'medium' },
+    { id: 9039, text: 'Rainbow', difficulty: 'medium' },
+
+    // --- HARD (41-50) ---
+    { id: 9040, text: 'Philosophy', difficulty: 'hard' },
+    { id: 9041, text: 'Architecture', difficulty: 'hard' },
+    { id: 9042, text: 'Invisible', difficulty: 'hard' },
+    { id: 9043, text: 'Nostalgia', difficulty: 'hard' },
+    { id: 9044, text: 'Ambiguous', difficulty: 'hard' },
+    { id: 9045, text: 'Labyrinth', difficulty: 'hard' },
+    { id: 9046, text: 'Frequency', difficulty: 'hard' },
+    { id: 9047, text: 'Algorithm', difficulty: 'hard' },
+    { id: 9048, text: 'Strategy', difficulty: 'hard' },
+    { id: 9049, text: 'Velocity', difficulty: 'hard' }
+]
 };

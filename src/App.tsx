@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { wordBank } from './words';
 import type { GameState, Word, Team } from './types';
+import { Capacitor } from '@capacitor/core';
+import { NativeAudio } from '@capacitor-community/native-audio';
 
 // Internal Types
 interface RoundAttempt {
@@ -10,9 +12,26 @@ interface RoundAttempt {
 
 const teamNamesUz = ["Chumoli xo'r Sherlar", "G'ilay Burgutlar", "Safsataboz Lochinlar", 
                     "Yovuz Quyonchalar", "Otqochar Chavandozlar","Parhez-Parast Pandalar",
-                    "Poygachi Shilliqqurtlar", "Qonxo'r Qo'ylar"];
-const teamNamesEn = ["Lions", "Eagles", "Falcons", "Warriors", "Riders", "Wolves"];
-
+                    "Poygachi Shilliqqurtlar", "Qonxo'r Qo'ylar", "Dangasa Gepardlar", 
+                    "Tishsiz Bo'rilar", "Uyquchi Qoplonlar", "Parhezchi Begimotlar", 
+                  "Kamgap To'tiqushlar", "Semiz Chigirtkalar", "Zamonaviy Echkilar"];
+const teamNamesEn = [ 
+        "Iron Lions",
+        "Golden Eagles",
+        "Silver Wolves",
+        "Shadow Ninjas",
+        "Crimson Falcons",
+        "Ancient Warriors",
+        "Thunder Titans",
+        "Desert Phantoms",
+        "Storm Riders",
+        "Midnight Panthers",
+        "Wild Mustangs",
+        "Arctic Foxes",
+        "Royal Knights",
+        "Apex Predators",
+        "Valiant Vikings"
+      ];
 // Helper: Fisher-Yates Shuffle for O(n) randomization
 const shuffleArray = <T,>(array: T[]): T[] => {
   const shuffled = [...array];
@@ -24,6 +43,26 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 };
 
 function App() {
+    // This kills the white border at the root level
+    if (typeof document !== 'undefined') {
+      const style = document.createElement('style');
+      style.textContent = `
+        html, body {
+          background-color: #0f172a !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          width: 100vw;
+          height: 100vh;
+          overflow: hidden;
+          -webkit-user-select: none; /* Prevents text selection ghosting */
+        }
+        #root {
+          background-color: #0f172a !important;
+          height: 100%;
+        }
+      `;
+      document.head.appendChild(style);
+    }
   // Game Configuration
   const [gameState, setGameState] = useState<GameState | 'LANG_SELECT' | 'SETTINGS' | 'AWAIT_REVIEW'>('LANG_SELECT');
   const [language, setLanguage] = useState<'uz' | 'en'>('uz');
@@ -49,10 +88,6 @@ function App() {
   // null = not awarded yet, -1 = no one, 0/1 = team index awarded
   const [lastWordAwarded, setLastWordAwarded] = useState<number | null>(null);
   console.log(wordDeck,team1HasPlayedFinal,suddenRounds);
-  // Sound Refs
-  const correctSound = useRef(new Audio('/correct.mp3'));
-  const skipSound = useRef(new Audio('/skip.mp3'));
-  const endSound = useRef(new Audio('/times-up.mp3'));
 
   // Setup the game environment
   const setupGame = (selectedLang: 'uz' | 'en') => {
@@ -95,26 +130,52 @@ function App() {
     });
   }, [language]);
 
-  // Timer Logic: Optimized to only run when PLAYING
-  useEffect(() => {
-    let interval: number;
-    if (gameState === 'PLAYING') {
-      interval = window.setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            clearInterval(interval);
-            endSound.current.play();
-            // Instead of going straight to REVIEW, wait for user confirmation
-            setLastWordAwarded(null);
-            setGameState('AWAIT_REVIEW');
-            return 0;
-          }
-          return prev - 1;
+  // 1. Preload the sounds when the app starts so they are "ready" in memory
+// HOOK 1: Preloading (Only runs once when the app opens)
+useEffect(() => {
+  const initAudio = async () => {
+    // 1. Only run NativeAudio if we are actually on a mobile device
+    if (Capacitor.isNativePlatform()) {
+      try {
+        // IMPORTANT: No "/" before the filename for Native Audio on iOS
+        await NativeAudio.preload({
+          assetId: 'correct',
+          assetPath: 'public/correct.mp3', 
+          audioChannelNum: 1
         });
-      }, 1000);
+        await NativeAudio.preload({
+          assetId: 'skip',
+          assetPath: 'public/skip.mp3',
+          audioChannelNum: 1
+        });
+      } catch (e) {
+        console.error('Native Audio Preload Failed:', e);
+      }
     }
-    return () => clearInterval(interval);
-  }, [gameState]);
+  };
+
+  initAudio();
+}, []);
+
+// HOOK 2: Timer Logic (Runs whenever gameState changes)
+useEffect(() => {
+  let interval: number;
+  if (gameState === 'PLAYING') {
+    interval = window.setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          // REMOVED: NativeAudio.play({ assetId: 'end' }); 
+          setLastWordAwarded(null);
+          setGameState('AWAIT_REVIEW');
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }
+  return () => clearInterval(interval);
+}, [gameState]);
 
   const startRound = () => {
     setRoundHistory([]);
@@ -124,17 +185,25 @@ function App() {
     setGameState('PLAYING');
   };
 
-  const handleAction = (isCorrect: boolean) => {
-    // Sound handling with reset to prevent delay
-    const sound = isCorrect ? correctSound.current : skipSound.current;
-    sound.currentTime = 0;
-    sound.play().catch(() => {}); // Catch block prevents issues with browser auto-play policies
+// 3. Updated Action Logic for instant sounds
+const handleAction = (isCorrect: boolean) => {
+  const assetId = isCorrect ? 'correct' : 'skip';
+  const fileName = isCorrect ? 'correct.mp3' : 'skip.mp3';
 
-    if (currentWord) {
-      setRoundHistory(prev => [...prev, { word: currentWord, isCorrect }]);
-    }
-    getNextWord();
-  };
+  if (Capacitor.isNativePlatform()) {
+    // High-performance sound for iPhone
+    NativeAudio.play({ assetId });
+  } else {
+    // Standard web sound for Localhost testing
+    const audio = new Audio(`/${fileName}`);
+    audio.play().catch(e => console.log("Web audio wait for click:", e));
+  }
+
+  if (currentWord) {
+    setRoundHistory(prev => [...prev, { word: currentWord, isCorrect }]);
+  }
+  getNextWord();
+};
 
   const toggleReviewStatus = (index: number) => {
     setRoundHistory(prev => {
@@ -384,7 +453,7 @@ function App() {
             </div>
             {lastWordAwarded !== null && lastWordAwarded >= 0 && (
               <div style={{textAlign: 'center', marginTop: 10}}>
-                {`${teams[lastWordAwarded].name} awarded`}
+                {`${teams[lastWordAwarded].name} topishdi +1 ball`}
               </div>
             )}
           </div>
@@ -441,33 +510,243 @@ document.head.appendChild(style);
 
 // Styles object remains largely the same but ensured for responsiveness
 const styles: Record<string, React.CSSProperties> = {
-  container: { backgroundColor: '#0f172a', color: '#f8fafc', minHeight: '100dvh', fontFamily: 'sans-serif', display: 'flex', flexDirection: 'column', overflow: 'hidden' },
-  fullScreenCenter: { flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '40px', textAlign: 'center' },
-  brandTitle: { fontSize: '72px', fontWeight: '900', color: '#38bdf8', marginBottom: '20px' },
-  mainButton: { width: '100%', padding: '20px', borderRadius: '16px', border: 'none', backgroundColor: '#38bdf8', color: '#0f172a', fontWeight: 'bold', fontSize: '20px', cursor: 'pointer' },
-  settingsBox: { width: '100%', maxWidth: '400px', backgroundColor: '#1e293b', padding: '20px', borderRadius: '16px', marginBottom: '40px' },
-  settingRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '15px 0', fontSize: '18px' },
-  flexCenter: { display: 'flex', alignItems: 'center' },
-  circleBtn: { width: '36px', height: '36px', borderRadius: '50%', border: 'none', backgroundColor: '#38bdf8', fontWeight: 'bold', fontSize: '20px', cursor: 'pointer' },
-  checkbox: { width: '24px', height: '24px' },
-  gameContent: { flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', overflow: 'hidden' },
-  scoreRow: { display: 'flex', justifyContent: 'space-around', padding: '20px', fontSize: '18px' },
-  activeT: { color: '#38bdf8', borderBottom: '2px solid #38bdf8', fontWeight: 'bold' },
-  centerBox: { flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' },
-  hugeText: { fontSize: '60px', color: '#38bdf8', margin: 0, textAlign: 'center' },
-  bottomButton: { padding: '25px', backgroundColor: '#38bdf8', color: '#0f172a', border: 'none', fontWeight: 'bold', fontSize: '20px', cursor: 'pointer' },
-  awardBtn: { padding: '18px', borderRadius: '12px', backgroundColor: '#38bdf8', color: '#0f172a', fontWeight: 'bold', fontSize: '18px', cursor: 'pointer', border: '3px solid transparent' },
-  playHeader: { display: 'flex', justifyContent: 'space-between', padding: '20px', fontSize: '28px', fontWeight: 'bold' },
-  timerBar: { height: '8px', backgroundColor: '#1e293b', margin: '0 20px', borderRadius: '4px', overflow: 'hidden' },
-  timerProgress: { height: '100%', backgroundColor: '#38bdf8', transition: 'width 1s linear' },
-  wordArea: { flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0 20px' },
-  wordText: { fontSize: 'clamp(32px, 12vw, 64px)', fontWeight: 'bold', textAlign: 'center', textTransform: 'uppercase' },
-  actionArea: { display: 'flex', flexDirection: 'column', gap: '10px', padding: '20px' },
-  correctBtn: { padding: '30px', borderRadius: '16px', backgroundColor: '#22c55e', border: 'none', color: '#fff', fontSize: '24px', fontWeight: 'bold', cursor: 'pointer' },
-  skipBtn: { padding: '20px', borderRadius: '16px', backgroundColor: '#475569', border: 'none', color: '#fff', fontSize: '18px', cursor: 'pointer' },
-  reviewList: { flex: 1, overflowY: 'auto', padding: '0 20px', display: 'flex', flexDirection: 'column', gap: '8px' },
-  reviewItem: { display: 'flex', justifyContent: 'space-between', padding: '15px 20px', borderRadius: '12px', fontSize: '20px', fontWeight: 'bold', cursor: 'pointer' },
-  title: { marginBottom: '20px', color: '#38bdf8' }
+// 1. Force the container to be the exact height of the screen
+    container: { 
+    backgroundColor: '#0f172a', 
+    color: '#f8fafc', 
+    height: '100dvh', // Use dynamic viewport height
+    width: '100vw',
+    fontFamily: 'sans-serif', 
+    display: 'flex', 
+    flexDirection: 'column', 
+    overflow: 'hidden', // Keeps the "white border" fix working
+    position: 'fixed',   // Prevents the whole page from bouncing
+    top: 0,
+    left: 0
+  },
+  fullScreenCenter: { 
+    flex: 1, 
+    display: 'flex', 
+    flexDirection: 'column', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    padding: '40px', 
+    textAlign: 'center' 
+  },
+  brandTitle: { 
+    fontSize: '72px', 
+    fontWeight: '900', 
+    color: '#38bdf8', 
+    marginBottom: '20px' 
+  },
+  // FIXED: Standardizes the main buttons (Boshlash, Natijani Tekshirish)
+    mainButton: { 
+    width: '90%',           // Consistent width
+    alignSelf: 'center',    // Centers the button
+    padding: '20px', 
+    borderRadius: '24px',   // Large rounded corners
+    border: 'none', 
+    backgroundColor: '#38bdf8', 
+    color: '#0f172a', 
+    fontWeight: 'bold', 
+    fontSize: '20px', 
+    cursor: 'pointer',
+    marginBottom: '15px' 
+  },
+  settingsBox: { 
+    width: '100%', 
+    maxWidth: '400px', 
+    backgroundColor: '#1e293b', 
+    padding: '20px', 
+    borderRadius: '16px', 
+    marginBottom: '40px' 
+  },
+  settingRow: { 
+    display: 'flex', 
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
+    margin: '15px 0', 
+    fontSize: '18px' 
+  },
+  flexCenter: { 
+    display: 'flex', 
+    alignItems: 'center' 
+  },
+  circleBtn: { 
+    width: '36px', 
+    height: '36px', 
+    borderRadius: '50%', 
+    border: 'none', 
+    backgroundColor: '#38bdf8', 
+    fontWeight: 'bold', 
+    fontSize: '20px', 
+    cursor: 'pointer' 
+  },
+  checkbox: { 
+    width: '24px', 
+    height: '24px' 
+  },
+  // 2. This wrapper must take up all available space
+  gameContent: { 
+    flex: 1, 
+    display: 'flex', 
+    flexDirection: 'column', 
+    height: '100%',
+    width: '100%',
+    overflow: 'hidden' // Important: ensures only the list scrolls, not the header/footer
+  },
+  // FIXED: Ensures team scores don't overlap with the notch
+  scoreRow: { 
+    display: 'flex', 
+    justifyContent: 'space-around', 
+    padding: '20px', 
+    paddingTop: 'calc(env(safe-area-inset-top) + 10px)', 
+    fontSize: '18px' 
+  },
+  activeT: { 
+    color: '#38bdf8', 
+    borderBottom: '2px solid #38bdf8', 
+    fontWeight: 'bold' 
+  },
+  centerBox: { 
+    flex: 1, 
+    display: 'flex', 
+    flexDirection: 'column', 
+    justifyContent: 'center', 
+    alignItems: 'center' 
+  },
+  hugeText: { 
+    fontSize: '60px', 
+    color: '#38bdf8', 
+    margin: 0, 
+    textAlign: 'center' 
+  },
+  // FIXED: Makes BOSHLASH / NATIJANI TEKSHIRISH float and round on ALL corners
+    bottomButton: { 
+    width: '90%',           // Prevents it from being "huge" across the whole screen
+    alignSelf: 'center',    // Centers it
+    padding: '20px',        // Comfortable vertical padding
+    borderRadius: '20px',   // Rounds all 4 corners
+    backgroundColor: '#38bdf8', 
+    color: '#0f172a', 
+    border: 'none', 
+    fontWeight: 'bold', 
+    fontSize: '20px', 
+    cursor: 'pointer',
+    /* The Magic Part: Lift it away from the bottom bar */
+    marginBottom: 'calc(env(safe-area-inset-bottom) + 30px)', 
+    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' // Optional: adds a slight lift effect
+  },
+  awardBtn: { 
+    padding: '18px', 
+    borderRadius: '12px', 
+    backgroundColor: '#38bdf8', 
+    color: '#0f172a', 
+    fontWeight: 'bold', 
+    fontSize: '18px', 
+    cursor: 'pointer', 
+    border: '3px solid transparent' 
+  },
+  // FIXED: Pushes Timer and "Ball" display safely away from top icons
+  playHeader: { 
+    display: 'flex', 
+    justifyContent: 'space-between', 
+    padding: '20px', 
+    paddingTop: 'calc(env(safe-area-inset-top) + 15px)',
+    fontSize: '28px', 
+    fontWeight: 'bold' 
+  },
+  timerBar: { 
+    height: '8px', 
+    backgroundColor: '#1e293b', 
+    margin: '0 20px', 
+    borderRadius: '4px', 
+    overflow: 'hidden' 
+  },
+  timerProgress: { 
+    height: '100%', 
+    backgroundColor: '#38bdf8', 
+    transition: 'width 1s linear' 
+  },
+  wordArea: { 
+    flex: 1, 
+    display: 'flex', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    padding: '0 20px',
+    marginTop: '-30px' 
+  },
+  wordText: { 
+    fontSize: 'clamp(32px, 12vw, 64px)', 
+    fontWeight: 'bold', 
+    textAlign: 'center', 
+    textTransform: 'uppercase' 
+  },
+  // FIXED: Positions game buttons safely above the Home Indicator bar
+  // FIXED: Standardizes the "To'g'ri" and "Skip" buttons to be identical
+  // FIXED: Standardizes the "TO'G'RI" and "SKIP" buttons to be identical in width
+    actionArea: { 
+    display: 'flex', 
+    flexDirection: 'column', 
+    alignItems: 'center',   // Centers the buttons
+    gap: '12px', 
+    padding: '20px',
+    /* Pushes the game buttons up from the home bar */
+    paddingBottom: 'calc(env(safe-area-inset-bottom) + 40px)' 
+  },
+    correctBtn: { 
+    width: '100%',           // Fills 100% of the actionArea (which is 90% of screen)
+    maxWidth: '400px',      // Prevents it from getting too wide on iPads
+    padding: '25px', 
+    borderRadius: '20px',   // Rounded corners
+    backgroundColor: '#22c55e', 
+    border: 'none', 
+    color: '#fff', 
+    fontSize: '24px', 
+    fontWeight: 'bold', 
+    cursor: 'pointer' 
+  },
+    skipBtn: { 
+    width: '100%',           // Matches Correct button width
+    maxWidth: '400px',
+    padding: '18px', 
+    borderRadius: '20px',   // Rounded corners
+    backgroundColor: '#475569', 
+    border: 'none', 
+    color: '#fff', 
+    fontSize: '18px', 
+    cursor: 'pointer' 
+  },
+  // FIXED: The actual list of words needs "auto" scrolling and touch support
+  // 3. THE FIX: The list must have a specific height constraint to scroll
+  reviewList: { 
+    flex: 1, 
+    overflowY: 'auto',                // Enables vertical scroll
+    WebkitOverflowScrolling: 'touch', // Native iOS momentum scroll
+    padding: '10px 20px', 
+    display: 'flex', 
+    flexDirection: 'column', 
+    gap: '8px',
+    /* This is the secret: It tells the list it can't be taller than 
+       the space between the header and the bottom button.
+    */
+    maxHeight: '60vh', 
+    marginTop: '10px',
+    marginBottom: '10px'
+  },
+  reviewItem: { 
+    display: 'flex', 
+    justifyContent: 'space-between', 
+    padding: '15px 20px', 
+    borderRadius: '12px', 
+    fontSize: '20px', 
+    fontWeight: 'bold', 
+    cursor: 'pointer' 
+  },
+  title: { 
+    marginBottom: '20px', 
+    color: '#38bdf8' 
+  }
 };
 
 export default App;
