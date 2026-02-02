@@ -433,40 +433,76 @@ const handleAction = (isCorrect: boolean) => {
 
       {/* 4.5 WAIT FOR USER TO CONFIRM LAST WORD BEFORE REVIEW */}
       {gameState === 'AWAIT_REVIEW' && (
-        <div style={styles.gameContent}>
-          <div style={styles.playHeader}>
-            <div style={{color: '#fb7185'}}>0s</div>
-            <div>Ball: {currentRoundScore}</div>
-          </div>
-          <div style={styles.wordArea}>
-            <h1 style={styles.wordText}>{currentWord?.text}</h1>
-          </div>
-          <div style={styles.actionArea}>
-            <div style={{display: 'flex', gap: '10px'}}>
-              <button
-                onClick={() => awardPoint(0)}
-                style={{...styles.awardBtn, flex: 1, backgroundColor: lastWordAwarded === 0 ? '#10b981' : '#38bdf8', border: lastWordAwarded === 0 ? '3px solid #059669' : '3px solid transparent'}}
-              >
-                {teams[0].name}
-              </button>
-              <button
-                onClick={() => awardPoint(1)}
-                style={{...styles.awardBtn, flex: 1, backgroundColor: lastWordAwarded === 1 ? '#10b981' : '#38bdf8', border: lastWordAwarded === 1 ? '3px solid #059669' : '3px solid transparent'}}
-              >
-                {teams[1].name}
-              </button>
-            </div>
-            <div style={{display: 'flex', gap: '10px', marginTop: '10px'}}>
-              <button onClick={() => setGameState('REVIEW')} style={{...styles.bottomButton, width: '100%'}}>{language === 'uz' ? 'NATIJALARNI TEKSHIRISH' : 'CHECK RESULTS'}</button>
-            </div>
-            {lastWordAwarded !== null && lastWordAwarded >= 0 && (
-              <div style={{textAlign: 'center', marginTop: 10}}>
-                {`${teams[lastWordAwarded].name} topishdi +1 ball`}
-              </div>
-            )}
+      <div style={styles.gameContent}>
+        <div style={styles.playHeader}>
+          <div style={{ color: '#fb7185' }}>0s</div>
+          <div>
+            {language === 'uz' ? 'Ball' : 'Score'}: {currentRoundScore}
           </div>
         </div>
-      )}
+
+        <div style={styles.wordArea}>
+          <h1 style={styles.wordText}>{currentWord?.text}</h1>
+        </div>
+
+        <div style={styles.actionArea}>
+          {/* 1. Dynamic Question/Confirmation Area */}
+          <div style={{ textAlign: 'center', marginBottom: '15px' }}>
+            {lastWordAwarded === null ? (
+              <p style={{ color: '#38bdf8', fontSize: '18px', fontWeight: 'bold', margin: 0 }}>
+                {language === 'uz' ? "Bu so'zni kim topdi?" : "Who found the word?"}
+              </p>
+            ) : (
+              <p style={{ color: '#10b981', fontSize: '18px', fontWeight: 'bold', margin: 0 }}>
+                {language === 'uz' 
+                  ? `${teams[lastWordAwarded].name} topishdi +1 ball` 
+                  : `${teams[lastWordAwarded].name} found it! +1 point`}
+              </p>
+            )}
+          </div>
+
+          {/* 2. Team Selection Buttons */}
+          <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', alignItems: 'stretch' }}>
+            {[0, 1].map((index) => (
+              <button
+                key={index}
+                onClick={() => awardPoint(index)}
+                style={{
+                  ...styles.awardBtn,
+                  flex: 1,
+                  // UI Fixes for long names:
+                  minHeight: '60px', // Minimum height, but can grow if needed
+                  height: 'auto',      // Allows vertical expansion
+                  padding: '8px 4px', // Space for multi-line text
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textAlign: 'center',
+                  wordBreak: 'break-word', // Forces long words to wrap
+                  fontSize: '14px',        // Slightly smaller font to fit more
+                  lineHeight: '1.2',
+                  
+                  // Your existing dynamic styles:
+                  backgroundColor: lastWordAwarded === index ? '#10b981' : 'transparent',
+                  border: lastWordAwarded === index ? '3px solid #059669' : '2px solid #38bdf8',
+                  color: lastWordAwarded === index ? '#fff' : '#38bdf8',
+                }}
+              >
+                {teams[index].name}
+              </button>
+            ))}
+          </div>
+
+          {/* 3. Main Action Button */}
+          <button 
+            onClick={() => setGameState('REVIEW')} 
+            style={{ ...styles.bottomButton, width: '100%' }}
+          >
+            {language === 'uz' ? 'NATIJALARNI TEKSHIRISH' : 'CHECK RESULTS'}
+          </button>
+        </div>
+      </div>
+    )}
 
       {/* 5. ROUND REVIEW SCREEN */}
       {gameState === 'REVIEW' && (
