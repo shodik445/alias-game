@@ -399,7 +399,9 @@ const handleAction = (isCorrect: boolean) => {
             <h1 style={styles.hugeText}>{teams[currentTeamIndex].name}</h1>
             <p>{language === 'uz' ? 'Tayyormisiz?' : 'Ready?'}</p>
           </div>
-          <button onClick={startRound} style={styles.bottomButton}>BOSHLASH</button>
+          <button onClick={startRound} style={styles.bottomButton}>
+            {language === 'uz' ? "BOSHLASH" : "START"}
+          </button>
         </div>
       )}
 
@@ -417,8 +419,12 @@ const handleAction = (isCorrect: boolean) => {
             <h1 style={styles.wordText}>{currentWord?.text}</h1>
           </div>
           <div style={styles.actionArea}>
-            <button onClick={() => handleAction(true)} style={styles.correctBtn}>TO'G'RI</button>
-            <button onClick={() => handleAction(false)} style={styles.skipBtn}>O'TKAZIB YUBORISH</button>
+            <button onClick={() => handleAction(true)} style={styles.correctBtn}>
+              {language === 'uz' ? "TO'G'RI" : "CORRECT"}
+            </button>
+            <button onClick={() => handleAction(false)} style={styles.skipBtn}>
+              {language === 'uz' ? "O'TKAZIB YUBORISH" : "SKIP"}
+            </button>
           </div>
         </div>
       )}
@@ -476,7 +482,9 @@ const handleAction = (isCorrect: boolean) => {
               </div>
             ))}
           </div>
-          <button onClick={finalizeRound} style={styles.bottomButton}>TASDIQLASH (CONFIRM)</button>
+          <button onClick={finalizeRound} style={styles.bottomButton}>
+            {language === 'uz' ? "TASDIQLASH" : "CONFIRM"}
+          </button>
         </div>
       )}
 
